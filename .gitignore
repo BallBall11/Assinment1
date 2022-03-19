@@ -1,0 +1,10 @@
+__pycache__/
+*.o
+*.d
+*.a
+*.so
+*.bin
+*.elf
+*.fbi
+*.pcap
+*.prof
