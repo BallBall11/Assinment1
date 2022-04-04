@@ -1,24 +1,27 @@
-
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 import requests
 import re
 
 
 class CHAR(object):
-
-
-    def __init__(self, char_name):
-        self.char_name = char_name
+    def __init__(self):
+        self.char_name = ''
         self.HP = 15000  # 生命值
         self.atk = 1600  # 攻击力
         self.DEF = 800  # 防御力
         self.crit_rate = 50.0  # 暴击率
         self.crit_dmg = 100.0  # 暴击伤害
+        self.all_dmg = 46.6    # 全伤害加成
         self.bonus_list = []  # 伤害增益表
         self.skills = {}  # 技能倍率表
 
 
-    def setAttributes(self, atk=1600, crit_rate=5.0, crit_dmg=50.0, HP=15000, DEF=800):
+    def setCharName(self, char_name):
+        self.char_name = char_name
+
+
+    def setAttributes(self, atk=1600, crit_rate=5.0, crit_dmg=50.0, HP=15000, DEF=800, all_dmg=46.6):
         """
         Get the attributes of the character
         """
@@ -27,6 +30,7 @@ class CHAR(object):
         self.DEF = DEF
         self.crit_rate = crit_rate
         self.crit_dmg = crit_dmg
+        self.all_dmg = all_dmg
 
 
     def getSkillList(self):
@@ -113,13 +117,21 @@ class CHAR(object):
 
         return ans
 
+    
+    def display(self,damage_dict:dict):
+        s = ''
+        for skill_name, skill_damage in damage_dict.items():
+            s = '{0}{1}: {2}\n'.format(s, skill_name, skill_damage)
+        return s
+
 
 if __name__ == '__main__':
-    c = CHAR('神里凌华')
+    c = CHAR()
+    c.setCharName('雷电将军')
     c.setAttributes(2160,78.8,197.2)
     c.addBonus('A', 30) 
-    c.addBonus('AEQ', 46.6)
-    c.addBonus('AEQ', 18)
-    print(c.compuetDamage('A', 1, 'C'))
-    print(c.compuetDamage('E', 10, 'C'))
+    c.addBonus('EQ', 46.6)
+    c.addBonus('Q', 18)
+    print(c.display(c.compuetDamage('A', 1, 'C')))
+    # print(c.compuetDamage('E', 10, 'C'))
     
