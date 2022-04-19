@@ -13,15 +13,16 @@ class CHAR(object):
         self.crit_rate = 50.0  # 暴击率
         self.crit_dmg = 100.0  # 暴击伤害
         self.all_dmg = 46.6    # 全伤害加成
-        self.bonus_list = []  # 伤害增益表
+        self.bonus_list = {'A':0.0, 'E':0.0,'Q':0.0}  # 伤害增益表
         self.skills = {}  # 技能倍率表
 
 
     def setCharName(self, char_name):
         self.char_name = char_name
+        self.skills = {}
 
 
-    def setAttributes(self, atk=1600, crit_rate=5.0, crit_dmg=50.0, HP=15000, DEF=800, all_dmg=46.6):
+    def setAttributes(self, atk=1600.0, crit_rate=50.0, crit_dmg=100.0, HP=15000.0, DEF=800.0, all_dmg=46.6):
         """
         Get the attributes of the character
         """
@@ -65,11 +66,14 @@ class CHAR(object):
         
 
     def addBonus(self, bonus_type, bonus_ratio):
-        self.bonus_list.append((bonus_type,bonus_ratio))
+        if bonus_type in self.bonus_list:
+            self.bonus_list[bonus_type] = self.bonus_list[bonus_type] + bonus_ratio
+        else:
+            self.bonus_list[bonus_type] = bonus_ratio
         # print(self.bonus_list)
 
 
-    def compuetDamage(self, skill, level, is_crit='E'):
+    def computeDamage(self, skill, level, is_crit='E'):
         """
         Conpute the damage of the skill of the level.
         para:
@@ -88,12 +92,14 @@ class CHAR(object):
         else:
             B = 1.0 + self.crit_rate * self.crit_dmg / 10000.0
         C = 1.0
-        for bonus in self.bonus_list:
-            # print('bonus:',bonus)
-            # print(bonus[0].find(skill))
-            if bonus[0].find(skill) >= 0:
-                C = C + bonus[1] / 100.0
-        # print('C = ',C)
+        # for bonus_type,bonus_value in self.bonus_list.items():
+        #     # print('bonus:',bonus)
+        #     # print(bonus[0].find(skill))
+        #     if bonus[0].find(skill) >= 0:
+        #         C = C + bonus[1] / 100.0
+        # # print('C = ',C)
+        C = C + self.bonus_list[skill] / 100.0
+        C = C + self.all_dmg / 100.0
         names = list(self.getSkillList().keys())
         name_of = {}
         name_of['A'] = names[0]
@@ -123,15 +129,21 @@ class CHAR(object):
         for skill_name, skill_damage in damage_dict.items():
             s = '{0}{1}: {2}\n'.format(s, skill_name, skill_damage)
         return s
-
+    
+    def b_display(self):
+        s = '伤害加成:\n'
+        d_skill = {'A':'普通攻击','E':'元素战技','Q':'元素爆发'}
+        for skill_name, skill_damage in self.bonus_list.items():
+            s = '{0}{1}: {2}\n'.format(s, d_skill[skill_name], skill_damage)
+        return s
 
 if __name__ == '__main__':
     c = CHAR()
     c.setCharName('雷电将军')
     c.setAttributes(2160,78.8,197.2)
     c.addBonus('A', 30) 
-    c.addBonus('EQ', 46.6)
+    c.addBonus('A', 46.6)
     c.addBonus('Q', 18)
-    print(c.display(c.compuetDamage('A', 1, 'C')))
-    # print(c.compuetDamage('E', 10, 'C'))
+    print(c.display(c.computeDamage('A', 1, 'C')))
+    print(c.b_display())
     
