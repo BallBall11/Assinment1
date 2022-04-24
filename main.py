@@ -6,6 +6,9 @@ import dmg_ccl
 from character import CHAR
 
 def init(ui,char):
+    """
+    initalize the app
+    """
     # char = None
     ui.lineEdit_CharName.setText('')
     ui.doubleSpinBox_ATK.setValue(1600.0)
@@ -20,6 +23,9 @@ def init(ui,char):
 
 
 def load_char(ui,char):
+    """
+    load the character's name
+    """
     char_name = ui.lineEdit_CharName.text()
     char.setCharName(char_name)
     char.getSkillList()
@@ -27,6 +33,9 @@ def load_char(ui,char):
 
 
 def cpt_damage(ui, char):
+    """
+    compute and show the damage of the skill
+    """
     d_skill = ['A','E','Q']
     skill_index =  ui.comboBox_DmgType.currentIndex()
     skill_level = ui.spinBox_SkillLevel.value()
@@ -36,6 +45,9 @@ def cpt_damage(ui, char):
 
 
 def load_attr(ui, char):
+    """
+    load the attributes of character
+    """
     char.setAttributes(
         atk = ui.doubleSpinBox_ATK.value(),
         DEF = ui.doubleSpinBox_DEF.value(),
@@ -48,6 +60,9 @@ def load_attr(ui, char):
 
 
 def add_bonus(ui,char):
+    """
+    add a bonus to the bonus list
+    """
     d_skill = ['A','E','Q']
     bonus_type = ui.comboBox_BonusType.currentIndex()
     bonus_value = ui.doubleSpinBox_Bonus.value()
@@ -57,6 +72,10 @@ def add_bonus(ui,char):
     ui.label_State.setText('Bonus adding done')
 
 def clear_bonus(ui,char):
+    """
+    clear the bonus list
+    """
+
     l = ['A', 'E', 'Q']
     for i in l:
         char.bonus_list[i] = 0.0

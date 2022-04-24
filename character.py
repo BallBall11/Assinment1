@@ -13,18 +13,21 @@ class CHAR(object):
         self.crit_rate = 50.0  # 暴击率
         self.crit_dmg = 100.0  # 暴击伤害
         self.all_dmg = 46.6    # 全伤害加成
-        self.bonus_list = {'A':0.0, 'E':0.0,'Q':0.0}  # 伤害增益表
+        self.bonus_list = {}  # 伤害增益表
         self.skills = {}  # 技能倍率表
 
 
     def setCharName(self, char_name):
+        """
+        set the name of a character
+        """
         self.char_name = char_name
         self.skills = {}
 
 
     def setAttributes(self, atk=1600.0, crit_rate=50.0, crit_dmg=100.0, HP=15000.0, DEF=800.0, all_dmg=46.6):
         """
-        Get the attributes of the character
+        Set the attributes of the character
         """
         self.HP = HP
         self.atk = atk
@@ -37,7 +40,8 @@ class CHAR(object):
     def getSkillList(self):
         """
         Get the skill list and all the skill ratios from the Wiki online.
-        return: dict {skill_name: {part_name: [ratios]}}
+        return: 
+            dict {skill_name: {part_name: [ratios]}}
         """
         if self.skills:
             return self.skills
@@ -57,6 +61,7 @@ class CHAR(object):
                 for k, td in enumerate(tr.find_all('td')):
                     if td.text != '' and td.text != "'":
                         part_ratio.append(td.text)
+                # 剔除非伤害部分
                 if part_ratio and part_ratio[0].find('伤害') > 0:
                     skill_ratio[part_ratio[0]] = part_ratio[1:]
             if skill_ratio:
@@ -66,10 +71,16 @@ class CHAR(object):
         
 
     def addBonus(self, bonus_type, bonus_ratio):
-        if bonus_type in self.bonus_list:
-            self.bonus_list[bonus_type] = self.bonus_list[bonus_type] + bonus_ratio
-        else:
-            self.bonus_list[bonus_type] = bonus_ratio
+        """
+        add a bonus to the bonus_list.
+        para: 
+            bonus_type: 'A', 'E' or 'Q'
+            bonus_ratio: a float for the ratio
+        """
+        if bonus_type not in self.bonus_list:
+            self.bonus_list[bonus_type] = 0.0
+        self.bonus_list[bonus_type] = self.bonus_list[bonus_type] + bonus_ratio
+        
         # print(self.bonus_list)
 
 
@@ -92,13 +103,13 @@ class CHAR(object):
         else:
             B = 1.0 + self.crit_rate * self.crit_dmg / 10000.0
         C = 1.0
-        # for bonus_type,bonus_value in self.bonus_list.items():
-        #     # print('bonus:',bonus)
-        #     # print(bonus[0].find(skill))
-        #     if bonus[0].find(skill) >= 0:
-        #         C = C + bonus[1] / 100.0
-        # # print('C = ',C)
-        C = C + self.bonus_list[skill] / 100.0
+        for bonus_type,bonus_value in self.bonus_list.items():
+            # print('bonus:',bonus)
+            # print(bonus[0].find(skill))
+            if bonus_type.find(skill) >= 0:
+                C = C + bonus_value / 100.0
+        # print('C = ',C)
+        # C = C + self.bonus_list[skill] / 100.0
         C = C + self.all_dmg / 100.0
         names = list(self.getSkillList().keys())
         name_of = {}
@@ -125,12 +136,18 @@ class CHAR(object):
 
     
     def display(self,damage_dict:dict):
+        """
+        transform the damage dictionary to a string for display
+        """
         s = ''
         for skill_name, skill_damage in damage_dict.items():
             s = '{0}{1}: {2}\n'.format(s, skill_name, skill_damage)
         return s
     
     def b_display(self):
+        """
+        return a string containing all bonuses
+        """
         s = '伤害加成:\n'
         d_skill = {'A':'普通攻击','E':'元素战技','Q':'元素爆发'}
         for skill_name, skill_damage in self.bonus_list.items():

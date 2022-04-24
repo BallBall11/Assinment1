@@ -9,5 +9,9 @@ __pycache__/
 *.pcap
 *.prof
 *.ipynb
+*.png
 
 test.py
+
+设计报告.md
+设计报告.pdf
